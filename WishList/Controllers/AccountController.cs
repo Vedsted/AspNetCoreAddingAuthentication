@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WishList.Models;
-using WishList.Models.RegisterViewModels;
+using WishList.Models.AccountViewModels;
 
 namespace WishList.Controllers
 {
@@ -37,18 +37,16 @@ namespace WishList.Controllers
 
             var user = new ApplicationUser() { UserName = model.Email, Email = model.Email};
             var identityResult = await _userManager.CreateAsync(user, model.Password);
-            
-            if (!identityResult.Succeeded)
-            {
-                foreach (var error in identityResult.Errors)
-                {
-                    ModelState.AddModelError("Password", error.Description);
-                }
-                
-                return View("Register", model);
-            }
 
-            return RedirectToAction("Index", "Home");
+            if (identityResult.Succeeded)
+                return RedirectToAction("Index", "Home");
+
+            foreach (var error in identityResult.Errors)
+            {
+                ModelState.AddModelError("Password", error.Description);
+            }
+                
+            return View("Register", model);
         }
     }
 }
